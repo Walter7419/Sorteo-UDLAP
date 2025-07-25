@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gran Sorteo - Compra tu Boleto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff8c00 0%, #32cd32 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 1200px;
+            width: 100%;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.1) 10px,
+                rgba(255, 255, 255, 0.1) 20px
+            );
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #e9ecef;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #495057;
+            transition: all 0.3s ease;
+            border-right: 1px solid #dee2e6;
+        }
+
+        .tab:last-child {
+            border-right: none;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6b35 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 140, 0, 0.3);
+        }
+
+        .tab:hover:not(.active) {
+            background: #dee2e6;
+            transform: translateY(-1px);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 40px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .image-section {
+            background: linear-gradient(135deg, #32cd32 0%, #228b22 100%);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(50, 205, 50, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .image-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .image-placeholder {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 3px dashed #32cd32;
+            color: #666;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-placeholder:hover {
+            border-color: #228b22;
+            background: #f8fff8;
+        }
+
+        .image-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+
+        .image-section h3 {
+            color: white;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .text-input-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid #32cd32;
+        }
+
+        .text-input-section h4 {
+            color: #228b22;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #32cd32;
+            border-radius: 8px;
+            font-size: 1em;
+            resize: vertical;
+            min-height: 120px;
+            font-family: Arial, sans-serif;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #228b22;
+            box-shadow: 0 0 8px rgba(50, 205, 50, 0.3);
+        }
+
+        .ticket-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid #ff8c00;
+        }
+
+        .ticket-section h2 {
+            color: #ff6b35;
+            margin-bottom: 20px;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .ticket-info {
+            background: linear-gradient(135deg, #fff5e6 0%, #f0fff0 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #ff8c00;
+        }
+
+        .price {
+            font-size: 2.5em;
+            color: #32cd32;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .quantity-btn {
+            background: #ff8c00;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(255, 140, 0, 0.3);
+        }
+
+        .quantity-btn:hover {
+            background: #ff6b35;
+            transform: scale(1.1);
+        }
+
+        .quantity-display {
+            background: white;
+            border: 2px solid #32cd32;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #32cd32;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .buy-btn {
+            background: linear-gradient(135deg, #32cd32 0%, #228b22 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3em;
+            border-radius: 30px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 16px rgba(50, 205, 50, 0.4);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .buy-btn:hover {
+            background: linear-gradient(135deg, #228b22 0%, #1e7b1e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(50, 205, 50, 0.6);
+        }
+
+        .tickets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .ticket-item {
+            background: linear-gradient(135deg, #32cd32 0%, #228b22 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 4px 8px rgba(50, 205, 50, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ticket-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(50, 205, 50, 0.5);
+        }
+
+        .ticket-item.sold {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            cursor: not-allowed;
+        }
+
+        .ticket-item.sold:hover {
+            transform: none;
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        .tickets-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .tickets-header h2 {
+            color: #ff6b35;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .tickets-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #fff5e6 0%, #f0fff0 100%);
+            border-radius: 10px;
+            border: 2px solid #ff8c00;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #32cd32;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            padding: 20px 0;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff8dc 0%, #f0fff0 100%);
+            border-radius: 15px;
+            border: 2px solid #ff8c00;
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .feature h4 {
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+
+        .countdown {
+            background: linear-gradient(135deg, #ff4500 0%, #ff6b35 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin: 20px -40px -40px -40px;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .countdown h3 {
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .timer {
+            font-size: 2em;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .tickets-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 10px;
+            }
+
+            .tickets-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 140, 0, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-circle:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-circle:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 10%;
+            background: rgba(50, 205, 50, 0.1);
+            animation-delay: 2s;
+        }
+
+        .floating-circle:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            top: 80%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎉 GRAN SORTEO 2025 🎉</h1>
+            <p>¡Tu oportunidad de ganar increíbles premios!</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('comprar')">🛒 Comprar Boletos</button>
+            <button class="tab" onclick="showTab('boletos')">🎫 Boletos Restantes</button>
+        </div>
+
+        <div id="comprar" class="tab-content active">
+            <div class="content">
+                <div class="image-section">
+                    <h3>🏆 Premio Principal</h3>
+                    <div class="image-placeholder">
+                        <img src="CapturaSorteo.png" alt="Premio" style="max-width: 100%; border-radius: 10px;">
+                    </div>
+                    <p style="color: white; font-size: 1.1em;">¡El premio que cambiará tu vida!</p>
+
+                    <div class="text-input-section">
+                        <h4>📝Quien soy?</h4>
+                        <textarea class="text-input" placeholder="Hola, soy Erick Walter. Actualmente cuento con una beca para estudiar en la Universidad de las Américas Puebla (UDLAP), por consecuencia tengo que vender boletos del sorteo de la universidad para continuar con mis estudios. Agradezco profundamente su apoyo y comprensión. ¡Muchas gracias!"></textarea>
+                    </div>
+                </div>
+
+                <div class="ticket-section">
+                    <h2>🎫 Comprar Boletos</h2>
+
+                    <div class="ticket-info">
+                        <h4 style="color: #ff6b35; margin-bottom: 10px;">📋 Información del Sorteo:</h4>
+                        <p><strong>📅 Fecha del sorteo:</strong> 22 de Noviembre, 2025</p>
+                        <p><strong>🎯 Números disponibles:</strong> 33 boletos</p>
+                    </div>
+
+                    <div class="price">$680.00 MXN</div>
+                    <p style="text-align: center; color: #666;">por boleto</p>
+
+
+
+                    <div style="text-align: center; margin: 20px 0;">
+                        <p style="font-size: 1.2em; color: #32cd32;">
+                            <strong>Total: $<span id="total">680.00</span> MXN</strong>
+                        </p>
+                        <p style="font-size: 1.2em; color: #32cd32;">
+                            <strong>Depositar a la cuenta: 0599750100026644730</strong>
+                        </p>
+                    </div>
+
+                    <button class="buy-btn" onclick="buyTickets()">
+                        🛒 Comprar Ahora
+                    </button>
+                </div>
+            </div>
+
+            <div class="countdown">
+                <h3>⏰ Tiempo restante para el sorteo:</h3>
+                <div class="timer" id="countdown">Calculando...</div>
+            </div>
+        </div>
+
+        <div id="boletos" class="tab-content">
+            <div class="tickets-header">
+                <h2>🎫 Boletos Restantes</h2>
+                <div class="tickets-stats">
+                    <div class="stat">
+                        <div class="stat-number" id="available-count">28</div>
+                        <div class="stat-label">Disponibles</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="sold-count">5</div>
+                        <div class="stat-label">Vendidos</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">33</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tickets-grid" id="tickets-grid">
+                <!-- Los boletos se generarán aquí con JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let quantity = 1;
+        const pricePerTicket = 680.00;
+
+        // Números específicos para cada boleto (puedes cambiar estos números)
+        const ticketNumbers = [
+            028380, 054801, 076682, 117283, 134624,
+            163595, 186486, 221487, 260398, 288779,
+            315440, 015589, 053090, 059021, 090742,
+            138053, 156704, 198225, 208776, 241777,
+            285098, 304649, 009041, 048312, 087743,
+            096604, 119965, 164196, 177887, 227588,
+            253519, 270140, 304411
+        ];
+
+        // Estado de los boletos (true = vendido, false = disponible)
+        let ticketsStatus = Array(33).fill(false);
+        // Marcar algunos boletos como vendidos para ejemplo
+        ticketsStatus[3] = true;
+        ticketsStatus[11] = true;
+        ticketsStatus[22] = true;
+        ticketsStatus[23] = true;
+        ticketsStatus[24] = true;
+        ticketsStatus[26] = true;
+
+
+
+        function showTab(tabName) {
+            // Ocultar todas las pestañas
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(button => button.classList.remove('active'));
+
+            // Mostrar la pestaña seleccionada
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Si es la pestaña de boletos, generar la grilla
+            if (tabName === 'boletos') {
+                generateTicketsGrid();
+            }
+        }
+
+        function generateTicketsGrid() {
+            const grid = document.getElementById('tickets-grid');
+            grid.innerHTML = '';
+
+            for (let i = 1; i <= 33; i++) {
+                const ticket = document.createElement('div');
+                ticket.className = `ticket-item ${ticketsStatus[i-1] ? 'sold' : ''}`;
+                ticket.textContent = `#${ticketNumbers[i-1]}`;
+
+                if (!ticketsStatus[i-1]) {
+                    ticket.onclick = () => selectTicket(ticketNumbers[i-1]);
+                }
+
+                grid.appendChild(ticket);
+            }
+
+            updateStats();
+        }
+
+        function selectTicket() {
+          window.open('https://docs.google.com/forms/d/e/1FAIpQLSeXy0GlO_-VvxOn9RQNM3ImaaAaStlE_gKCbE2dfWhmf3hDHw/viewform?usp=header', '_blank');
+        }
+
+        function updateStats() {
+            const sold = ticketsStatus.filter(status => status).length;
+            const available = 33 - sold;
+
+            document.getElementById('sold-count').textContent = sold;
+            document.getElementById('available-count').textContent = available;
+        }
+
+        function increaseQuantity() {
+            if (quantity < 10) {
+                quantity++;
+                updateDisplay();
+            }
+        }
+
+        function decreaseQuantity() {
+            if (quantity > 1) {
+                quantity--;
+                updateDisplay();
+            }
+        }
+
+
+        function buyTickets() {
+          window.open('https://docs.google.com/forms/d/e/1FAIpQLSeXy0GlO_-VvxOn9RQNM3ImaaAaStlE_gKCbE2dfWhmf3hDHw/viewform?usp=header', '_blank');
+        }
+
+
+        // Simulación de countdown
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const sorteoDate = new Date("2025-11-22T20:00:00").getTime();
+            const timeLeft = sorteoDate - now;
+
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            if (timeLeft > 0) {
+                document.getElementById('countdown').textContent =
+                    `${days} días ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+                document.getElementById('countdown').textContent = "¡SORTEO FINALIZADO!";
+            }
+        }
+
+        // Actualizar countdown cada segundo
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Generar la grilla de boletos al cargar la página
+        generateTicketsGrid();
+    </script>
+
+
+    <div id="info-deposito" style="display:none; margin-top: 20px;">
+        <p><strong>Deposita a esta cuenta:</strong></p>
+        <p>Banco: HSBC</p>
+        <p>CLABE: 0599750100026644730</p>
+        <p>Nombre: Antonio Trejo</p>
+
+        <div style="margin-top: 20px;">
+            <label for="comprobante">Sube tu comprobante de pago:</label><br>
+            <input type="file" id="comprobante" accept="image/*" style="margin-top: 5px;"><br><br>
+
+            <label for="foto-extra">Sube otra foto (opcional):</label><br>
+            <input type="file" id="foto-extra" accept="image/*" style="margin-top: 5px;"><br><br>
+
+            <button onclick="confirmarEnvio()">Confirmar envío</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function mostrarDatos() {
+        const cantidad = document.getElementById("cantidad").value;
+        const info = document.getElementById("info-deposito");
+        if (cantidad) {
+            info.style.display = "block";
+        } else {
+            info.style.display = "none";
+        }
+    }
+
+    function confirmarEnvio() {
+        const comprobante = document.getElementById("comprobante").files[0];
+        const extra = document.getElementById("foto-extra").files[0];
+
+        if (!comprobante) {
+            alert("Por favor sube tu comprobante de pago.");
+            return;
+        }
+
+        alert("¡Gracias! Tus archivos han sido enviados.");
+    }
+</script>
+
+</body>
+</html>
